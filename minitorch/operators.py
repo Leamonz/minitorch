@@ -248,7 +248,7 @@ def relu_back(x: float, y: float) -> float:
 
 # Implement the following core functions
 # - map
-def map(fn: Callable[[float], float]) -> function[[Iterable[float]], Iterable[float]]:
+def map(fn: Callable[[float], float]) -> Callable[[Iterable[float]], Iterable[float]]:
     """Apply fn to every element in a list
 
     Args:
@@ -286,7 +286,7 @@ def zipWith(
 # - reduce
 def reduce(
     reduce_fn: Callable[[float, float], float], start: float
-) -> function[[Iterable[float]], float]:
+) -> Callable[[Iterable[float]], float]:
     """Combine every element in a list using reduce_fn
 
     Args:
