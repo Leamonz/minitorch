@@ -62,11 +62,11 @@ def neg(x: float) -> float:
     Returns:
         float: -x
     """
-    return -x
+    return float(-x)
 
 
 # - lt
-def lt(x: float, y: float) -> bool:
+def lt(x: float, y: float) -> float:
     """Checks if x is less than y
 
     Args:
@@ -74,13 +74,13 @@ def lt(x: float, y: float) -> bool:
         y (float): y
 
     Returns:
-        bool: x < y
+        float: 1.0 if x < y else 0.0
     """
-    return x < y
+    return 1.0 if x < y else 0.0
 
 
 # - eq
-def eq(x: float, y: float) -> bool:
+def eq(x: float, y: float) -> float:
     """Checks if x is equal to y
 
     Args:
@@ -88,9 +88,9 @@ def eq(x: float, y: float) -> bool:
         y (float): y
 
     Returns:
-        bool: x == y
+        float: 1.0 if x == y else 0.0
     """
-    return x == y
+    return 1.0 if x == y else 0.0
 
 
 # - max
@@ -142,9 +142,9 @@ def relu(x: float) -> float:
         x (float): x
 
     Returns:
-        float: max(0, x)
+        float: max(0.0, x)
     """
-    return max(0, x)
+    return max(0.0, x)
 
 
 # - log
