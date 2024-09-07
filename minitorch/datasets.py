@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 
-def make_pts(N: int) -> List[Tuple[float, float]]:
+def make_pts(N):
     X = []
     for i in range(N):
         x_1 = random.random()
@@ -20,7 +20,15 @@ class Graph:
     y: List[int]
 
 
-def simple(N: int) -> Graph:
+def simple(N):
+    """Lable only depends on x-coordinate. Y = 1 iff x < 0.5
+
+    Args:
+        N (_type_): number of points
+
+    Returns:
+        _type_: _description_
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
@@ -29,7 +37,15 @@ def simple(N: int) -> Graph:
     return Graph(N, X, y)
 
 
-def diag(N: int) -> Graph:
+def diag(N):
+    """Diagonal points. Y = 1 iff x1 + x2 < 0.5, so the perfect line is x1 + x2 = 0.5
+
+    Args:
+        N (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
@@ -38,7 +54,15 @@ def diag(N: int) -> Graph:
     return Graph(N, X, y)
 
 
-def split(N: int) -> Graph:
+def split(N):
+    """Can't be learned by MLP. two classes are spearated into 3 parts in a 2-D space.
+
+    Args:
+        N (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
@@ -47,30 +71,52 @@ def split(N: int) -> Graph:
     return Graph(N, X, y)
 
 
-def xor(N: int) -> Graph:
+def xor(N):
+    """Classical XOR problem. Can't be solved by MLP
+
+    Args:
+        N (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
-        y1 = 1 if ((x_1 < 0.5 and x_2 > 0.5) or (x_1 > 0.5 and x_2 < 0.5)) else 0
+        y1 = 1 if x_1 < 0.5 and x_2 > 0.5 or x_1 > 0.5 and x_2 < 0.5 else 0
         y.append(y1)
     return Graph(N, X, y)
 
 
-def circle(N: int) -> Graph:
+def circle(N):
+    """Circular points
+
+    Args:
+        N (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
-        x1, x2 = (x_1 - 0.5, x_2 - 0.5)
+        x1, x2 = x_1 - 0.5, x_2 - 0.5
         y1 = 1 if x1 * x1 + x2 * x2 > 0.1 else 0
         y.append(y1)
     return Graph(N, X, y)
 
 
-def spiral(N: int) -> Graph:
-    def x(t: float) -> float:
+def spiral(N):
+    """Even worse
+
+    Args:
+        N (_type_): _description_
+    """
+
+    def x(t):
         return t * math.cos(t) / 20.0
 
-    def y(t: float) -> float:
+    def y(t):
         return t * math.sin(t) / 20.0
 
     X = [
