@@ -66,6 +66,8 @@ def test_simple(a: float, b: float) -> None:
     assert_close(c.data, minitorch.operators.relu(a) + minitorch.operators.relu(b))
 
     # Add others if you would like...
+    c = Scalar(a) - Scalar(b)
+    assert_close(c.data, a - b)
 
 
 one_arg, two_arg, _ = MathTestVariable._comp_testing()

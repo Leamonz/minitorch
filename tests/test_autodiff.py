@@ -56,6 +56,7 @@ def test_chain_rule2() -> None:
         0.0, ScalarHistory(Function1, ctx=Context(), inputs=[var, var])
     )
     back = constant.chain_rule(d_output=5)
+    print(back)
     back = list(back)
     assert len(back) == 2
     variable, deriv = back[0]
