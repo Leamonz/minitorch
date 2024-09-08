@@ -2,9 +2,11 @@
 Be sure you have minitorch installed in you Virtual Env.
 >>> pip install -Ue .
 """
+
 import random
 
 import minitorch
+from minitorch import operators
 
 
 class Network(minitorch.Module):
@@ -21,6 +23,20 @@ class Network(minitorch.Module):
         middle = [h.relu() for h in self.layer1.forward(x)]
         end = [h.relu() for h in self.layer2.forward(middle)]
         return self.layer3.forward(end)[0].sigmoid()
+
+
+class NetworkSplit(minitorch.Module):
+    def __init__(self, hidden_size):
+        super().__init__()
+        self.layer1 = Linear(2, hidden_size)
+        self.layer2 = Linear(2, hidden_size)
+        self.layer3 = Linear(hidden_size, 1)
+
+    def forward(self, x):
+        out1 = [h.relu() for h in self.layer1.forward(x)]
+        out2 = [h.relu() for h in self.layer2.forward(x)]
+        combine = operators.zipWith(out1, out2, operators.mul)
+        return self.layer3.forward(combine)[0].sigmoid()
 
 
 class Linear(minitorch.Module):
@@ -61,6 +77,7 @@ class ScalarTrain:
     def __init__(self, hidden_layers):
         self.hidden_layers = hidden_layers
         self.model = Network(self.hidden_layers)
+        # self.model = NetworkSplit(self.hidden_layers)
 
     def run_one(self, x):
         return self.model.forward(
@@ -110,7 +127,7 @@ class ScalarTrain:
 
 if __name__ == "__main__":
     PTS = 50
-    HIDDEN = 2
+    HIDDEN = 3
     RATE = 0.5
     data = minitorch.datasets["Simple"](PTS)
     ScalarTrain(HIDDEN).train(data, RATE)

@@ -279,7 +279,6 @@ def zipWith(
     Returns:
         Iterable[float]: combination of two iterables after applying fn
     """
-    assert len(a) == len(b)
     return [fn(e1, e2) for (e1, e2) in zip(a, b)]
 
 
@@ -310,7 +309,7 @@ def reduce(
 #
 # Use these to implement
 # - negList : negate a list
-def negList(ls: List[float]) -> List[float]:
+def negList(ls: List[float]) -> Iterable[float]:
     """Negate all elements in a list
 
     Args:
@@ -323,7 +322,7 @@ def negList(ls: List[float]) -> List[float]:
 
 
 # - addLists : add two lists together
-def addLists(ls1: List[float], ls2: List[float]) -> List[float]:
+def addLists(ls1: List[float], ls2: List[float]) -> Iterable[float]:
     """Computes element-wise sum of two lists
 
     Args:
