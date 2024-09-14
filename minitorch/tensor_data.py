@@ -8,8 +8,7 @@ import numpy as np
 import numpy.typing as npt
 from numpy import array, float64
 from typing_extensions import TypeAlias
-
-from .operators import prod
+from . import operators
 
 MAX_DIMS = 32
 
@@ -34,6 +33,7 @@ def index_to_position(index: Index, strides: Strides) -> int:
     """
     Converts a multidimensional tensor `index` into a single-dimensional position in
     storage based on strides.
+    tensor[i_1, i_2, ..., i_n] = storage[i_1 * s_1 + i_2 * s_2 + ... + i_n * s_n]
 
     Args:
         index : index tuple of ints
@@ -44,7 +44,8 @@ def index_to_position(index: Index, strides: Strides) -> int:
     """
 
     # TODO: Implement for Task 2.1.
-    raise NotImplementedError('Need to implement for Task 2.1')
+    # tensor[i_1, i_2, ..., i_n] = storage[i_1 * s_1 + i_2 * s_2 + ... + i_n * s_n]
+    return int(operators.sum(operators.zipWith(index, strides, operators.mul)))
 
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
@@ -61,7 +62,10 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
 
     """
     # TODO: Implement for Task 2.1.
-    raise NotImplementedError('Need to implement for Task 2.1')
+    dims = shape.size
+    strides = strides_from_shape(shape)
+    for i in range(dims):
+        out_index[i], ordinal = divmod(ordinal, strides[i])
 
 
 def broadcast_index(
@@ -73,7 +77,7 @@ def broadcast_index(
     it may be larger or with more dimensions than the `shape`
     given. Additional dimensions may need to be mapped to 0 or
     removed.
-
+    view https://dezeming.top/wp-content/uploads/2022/02/MiniTorch-%E5%AD%A6%E4%B9%A0%E5%85%A8%E6%94%BB%E7%95%A5.pdf P46 for explaination
     Args:
         big_index : multidimensional index of bigger tensor
         big_shape : tensor shape of bigger tensor
@@ -84,7 +88,10 @@ def broadcast_index(
         None
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    dims1, dims2 = big_shape.shape[0], shape.shape[0]
+    for i in range(dims2):
+        offset = i + (dims1 - dims2)
+        out_index[i] = big_index[offset] if shape[i] != 1 else 0
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -102,7 +109,27 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         IndexingError : if cannot broadcast
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    # shape1 is the bigger shape
+    lshape1, lshape2 = list(shape1), list(shape2)
+    dims1, dims2 = len(lshape1), len(lshape2)
+    if dims1 < dims2:
+        # swap to ensure lshape1 is bigger
+        lshape1, lshape2 = lshape2, lshape1
+        dims1, dims2 = dims2, dims1
+    # apply rule 2. ensure both have same dims
+    # apply rule 3. only insert additional dimensions on the left side of shape
+    lshape2 = [1 for _ in range(dims1 - dims2)] + lshape2
+    union_shape = lshape1
+    for i in range(dims1):
+        if lshape1[i] != lshape2[i]:
+            if lshape1[i] == 1 or lshape2[i] == 1:
+                # apply rule 1. dimension of size 1 can be repeated n times
+                union_shape[i] = max(lshape1[i], lshape2[i])
+            else:
+                raise IndexingError(
+                    f"Cannot broadcast {tuple(shape1)} and {tuple(shape2)}."
+                )
+    return tuple(union_shape)
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
@@ -144,7 +171,7 @@ class TensorData:
         self._shape = array(shape)
         self.strides = strides
         self.dims = len(strides)
-        self.size = int(prod(shape))
+        self.size = int(operators.prod(shape))
         self.shape = shape
         assert len(self._storage) == self.size
 
@@ -228,7 +255,9 @@ class TensorData:
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
 
         # TODO: Implement for Task 2.1.
-        raise NotImplementedError('Need to implement for Task 2.1')
+        new_strides = [self.strides[o] for o in order]
+        new_shape = [self.shape[o] for o in order]
+        return TensorData(self._storage, tuple(new_shape), tuple(new_strides))
 
     def to_string(self) -> str:
         s = ""
