@@ -244,6 +244,9 @@ class Tensor:
         key2 = (key,) if isinstance(key, int) else key
         self._tensor.set(key2, val)
 
+    def __len__(self) -> int:
+        return self.size
+
     # Internal methods used for autodiff.
     def _type_(self, backend: TensorBackend) -> None:
         self.backend = backend
@@ -261,6 +264,7 @@ class Tensor:
         backend: Optional[TensorBackend] = None,
     ) -> Tensor:
         "Create a new tensor from data"
+        print(storage)
         return Tensor(TensorData(storage, shape, strides), backend=backend)
 
     def expand(self, other: Tensor) -> Tensor:
