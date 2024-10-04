@@ -234,9 +234,7 @@ class Permute(Function):
     def forward(ctx: Context, a: Tensor, order: Tensor) -> Tensor:
         # TODO: Implement for Task 2.3.
         ctx.save_for_backward(order)
-        for v in order:
-            print(v)
-        return minitorch.Tensor.make(a._tensor.permute(*order), backend=a.backend)
+        return minitorch.Tensor.make(a._tensor.permute(*order.to_numpy().astype(np.int32)), backend=a.backend)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
